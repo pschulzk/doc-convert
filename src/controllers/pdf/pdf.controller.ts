@@ -12,7 +12,7 @@ import {
 import {
     IRequestContentDto,
     RequestContentDto,
-    IResponseContentDto,
+    ResponseContentDto,
     EConversionFormats,
 } from '../../types';
 
@@ -27,11 +27,14 @@ export class PdfController extends ConversionController {
         const requestContentDto: RequestContentDto
             = new RequestContentDto( EConversionFormats.PDF, file );
 
-        // console.log('requestContentDto:', requestContentDto );
+        const responseContentDto: ResponseContentDto =  new ResponseContentDto();
+        responseContentDto.sourceFormat = requestContentDto.sourceFormat;
+        responseContentDto.targetFormat = requestContentDto.targetFormat;
 
-        // return {
-        //     data: 'SUCCESS',
-        //     req: createResponseContentDto,
-        // };
+        return {
+            data: {
+                requestResponse: responseContentDto,
+            },
+        };
     }
 }
