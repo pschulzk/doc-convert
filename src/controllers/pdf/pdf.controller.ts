@@ -1,6 +1,5 @@
 /** NEST imports */
 import {
-    Inject,
     Controller,
     Get,
     Post,
@@ -35,22 +34,24 @@ export class PdfController extends ConversionController {
 
     /**
      * @description recieve conversion request data and provide response
-     * @returns {object}
+     * @returns {Promise<object>}
      */
     @Post()
     @UseInterceptors( FileInterceptor('file') )
     public async upload(@UploadedFile() file): Promise<object> {
         const requestContentDto: RequestContentDto
-            = new RequestContentDto( EConversionFormats.PDF, file );
+            = new RequestContentDto( this.targetMimetype, file );
 
         const responseContentDto: ResponseContentDto = new ResponseContentDto();
         responseContentDto.sourceMimetype = requestContentDto.sourceMimetype;
         responseContentDto.targetMimetype = requestContentDto.targetMimetype;
 
-        return {
+        const response: object = {
             data: {
                 requestResponse: responseContentDto,
             },
         };
+
+        return response;
     }
 }

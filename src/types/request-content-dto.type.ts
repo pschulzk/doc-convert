@@ -34,8 +34,6 @@ export class RequestContentDto implements IRequestContentDto {
     };
 
     constructor( targetMimetype: EConversionFormats, file: any ) {
-        // console.log('RequestContentDto.file:', file);
-        
         this.targetMimetype = targetMimetype;
         this.sourceMimetype = this._detectFormat( file.mimetype );
         this.requestFile.originalname = file.originalname;
