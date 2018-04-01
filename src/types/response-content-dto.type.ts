@@ -8,9 +8,9 @@ import { EConversionFormats } from './conversion-formats.type';
 
 export interface IResponseContentDto {
     /** file format of document sent */
-    sourceFormat: EConversionFormats;
+    sourceMimetype: EConversionFormats;
     /** desired format to be returned */
-    targetFormat: EConversionFormats;
+    targetMimetype: EConversionFormats;
     /** download URI of original document file */
     sourceDownloadUrl: URL;
     /** download URI of requested document file */
@@ -19,23 +19,11 @@ export interface IResponseContentDto {
 
 export class ResponseContentDto implements IResponseContentDto {
 
-    public sourceFormat: EConversionFormats;
+    public sourceMimetype: EConversionFormats;
 
-    public targetFormat: EConversionFormats;
+    public targetMimetype: EConversionFormats;
 
     public sourceDownloadUrl: URL;
 
     public targetDownloadUrl: URL;
-
-    // constructor(
-    //     sourceFormat: EConversionFormats,
-    //     targetFormat: EConversionFormats,
-    //     sourceDownloadUrl: URL,
-    //     targetDownloadUrl: URL,
-    // ) {
-    //     this.sourceFormat = sourceFormat;
-    //     this.targetFormat = targetFormat;
-    //     this.sourceDownloadUrl = sourceDownloadUrl;
-    //     this.targetDownloadUrl = targetDownloadUrl;
-    // }
 }

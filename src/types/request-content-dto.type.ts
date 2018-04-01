@@ -8,9 +8,9 @@ import { EConversionFormats } from './conversion-formats.type';
 
 export interface IRequestContentDto {
     /** file format of document sent */
-    sourceFormat: any;
+    sourceMimetype: any;
     /** desired format to be returned */
-    targetFormat: EConversionFormats;
+    targetMimetype: EConversionFormats;
     /** download URI of original document file */
     requestFile: IRequestFile;
 }
@@ -23,9 +23,9 @@ export interface IRequestFile {
 
 export class RequestContentDto implements IRequestContentDto {
 
-    public sourceFormat: any;
+    public sourceMimetype: any;
 
-    public targetFormat: EConversionFormats;
+    public targetMimetype: EConversionFormats;
 
     public requestFile: IRequestFile = {
         originalname: null,
@@ -33,9 +33,11 @@ export class RequestContentDto implements IRequestContentDto {
         size: null,
     };
 
-    constructor( targetFormat: EConversionFormats, file: any ) {
-        this.targetFormat = targetFormat;
-        this.sourceFormat = this._detectFormat( file.mimetype );
+    constructor( targetMimetype: EConversionFormats, file: any ) {
+        // console.log('RequestContentDto.file:', file);
+        
+        this.targetMimetype = targetMimetype;
+        this.sourceMimetype = this._detectFormat( file.mimetype );
         this.requestFile.originalname = file.originalname;
         this.requestFile.size = file.size;
         this.requestFile.mimetype = file.mimetype;
