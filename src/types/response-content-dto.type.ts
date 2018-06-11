@@ -32,4 +32,6 @@ export class ResponseContentDto implements IResponseContentDto {
     public sourceDownloadUrl: URL;
 
     public targetDownloadUrl: URL;
+
+    public convertedFile: any;
 }

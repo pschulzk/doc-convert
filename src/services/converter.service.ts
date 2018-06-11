@@ -5,11 +5,12 @@ import {
 @Injectable()
 export class ConverterService {
 
-  constructor() {
-    console.log( '!!! ConverterService' );
-  }
+    constructor() {
 
-  public convert(): string {
-    return 'Hello World!';
-  }
+    }
+
+    public convert( file: any ): any {
+        // console.log( '!!! ConverterService:', file );
+        return file;
+    }
 }

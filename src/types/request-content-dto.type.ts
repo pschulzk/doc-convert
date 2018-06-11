@@ -26,11 +26,14 @@ export class RequestContentDto implements IRequestContentDto {
 
     public targetMimetype: EConversionFormats;
 
-    public requestFile: File;
+    public requestFile: any;
+
+    public convertedFile: any;
 
     public requestFileUrl: UrlObject;
 
     constructor( file: any, targetMimetype: EConversionFormats,  ) {
+        this.requestFile = file;
         this.targetMimetype = targetMimetype;
         this.sourceMimetype = DetectFormatUtils.detectFormat( file.mimetype );
     }
@@ -40,6 +43,7 @@ export class RequestContentDto implements IRequestContentDto {
         const response: ResponseContentDto = new ResponseContentDto();
         response.sourceMimetype = this.sourceMimetype;
         response.targetMimetype = this.targetMimetype;
+        response.convertedFile = this.convertedFile;
         return response;
     }
 
