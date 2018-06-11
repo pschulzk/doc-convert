@@ -24,7 +24,6 @@ export class ConverterController extends AbstractController {
     /** -------------------------------------------------------------------------------------------
      * VARIABLES
      */ // ----------------------------------------------------------------------------------------
-     public targetMimetype: EConversionFormats = EConversionFormats.PDF;
 
      /** -------------------------------------------------------------------------------------------
       * CONSTRUCTOR
@@ -40,8 +39,8 @@ export class ConverterController extends AbstractController {
     @Post()
     @UseInterceptors( FileInterceptor('file') )
     public async upload(
-        @UploadedFile() file,
-        @Query( 'targetMimeType' ) targetMimeType: string,
+        @UploadedFile() file: File,
+        @Query( 'targetMimeType' ) targetMimeType: EConversionFormats,
     ): Promise<object> {
 
         const requestContentDto: RequestContentDto

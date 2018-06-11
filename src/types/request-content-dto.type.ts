@@ -30,7 +30,7 @@ export class RequestContentDto implements IRequestContentDto {
 
     public requestFileUrl: UrlObject;
 
-    constructor( targetMimetype: EConversionFormats, file: any ) {
+    constructor( file: any, targetMimetype: EConversionFormats,  ) {
         this.targetMimetype = targetMimetype;
         this.sourceMimetype = DetectFormatUtils.detectFormat( file.mimetype );
     }
