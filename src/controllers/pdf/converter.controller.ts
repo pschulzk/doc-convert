@@ -1,11 +1,12 @@
 /** NEST imports */
 import {
     Controller,
-    Get,
+    // Get,
     Post,
     FileInterceptor,
     UseInterceptors,
     UploadedFile,
+    Query,
 } from '@nestjs/common';
 
 /** CUSTOM imports */
@@ -15,10 +16,10 @@ import {
     EConversionFormats,
 } from '../../types';
 
-import { ConversionController } from '../../classes';
+import { AbstractController } from '../../classes';
 
-@Controller('to-pdf')
-export class PdfController extends ConversionController {
+@Controller('convert')
+export class ConverterController extends AbstractController {
 
     /** -------------------------------------------------------------------------------------------
      * VARIABLES
@@ -38,17 +39,17 @@ export class PdfController extends ConversionController {
      */
     @Post()
     @UseInterceptors( FileInterceptor('file') )
-    public async upload(@UploadedFile() file): Promise<object> {
-        const requestContentDto: RequestContentDto
-            = new RequestContentDto( this.targetMimetype, file );
+    public async upload(
+        @UploadedFile() file,
+        @Query( 'targetMimeType' ) targetMimeType: string,
+    ): Promise<object> {
 
-        const responseContentDto: ResponseContentDto = new ResponseContentDto();
-        responseContentDto.sourceMimetype = requestContentDto.sourceMimetype;
-        responseContentDto.targetMimetype = requestContentDto.targetMimetype;
+        const requestContentDto: RequestContentDto
+            = new RequestContentDto( file, targetMimeType );
 
         const response: object = {
             data: {
-                requestResponse: responseContentDto,
+                requestResponse: requestContentDto.getResponseContentDto(),
             },
         };
 

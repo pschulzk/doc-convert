@@ -1,4 +1,4 @@
-#Node-Service-DoConvert
+# Node-Service-DoConvert
 
 ## Description
 
@@ -7,11 +7,25 @@ A document converter.
 ## API paths
 ### convert to PDF
 ```
-POST /to-pdf
+POST /convert-html-to-pdf
 ```
+#### Accepts
+```
+{
+  file: <DOCUMENT TO CONVERT>
+}
+```
+or
+```
+{
+  file: <DOCUMENT TO CONVERT>
+}
+```
+#### Responds
+
 ### convert to DOCX
 ```
-POST /to-docx
+POST /convert-html-to-docx
 ```
 
 ## Upload as multipart/form-data

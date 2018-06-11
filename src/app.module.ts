@@ -2,15 +2,20 @@ import { Module } from '@nestjs/common';
 
 import {
   RootController,
-  PdfController,
+  ConverterController,
 } from './controllers';
 
+import {
+  ConverterService,
+} from './services';
+
 @Module({
-  imports: [],
+  // imports: [],
   controllers: [
     RootController,
-    PdfController,
+    ConverterController,
   ],
-  components: [],
+  providers: [ ConverterService ],
+  // components: [],
 })
 export class AppModule {}

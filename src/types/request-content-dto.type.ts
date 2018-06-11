@@ -1,4 +1,7 @@
 import { EConversionFormats } from './conversion-formats.type';
+import { ResponseContentDto } from './response-content-dto.type';
+import { UrlObject } from 'url';
+import { DetectFormatUtils } from '../utils';
 
 /**
  *
@@ -11,14 +14,10 @@ export interface IRequestContentDto {
     sourceMimetype: any;
     /** desired format to be returned */
     targetMimetype: EConversionFormats;
+    /** original document file */
+    requestFile?: File;
     /** download URI of original document file */
-    requestFile: IRequestFile;
-}
-
-export interface IRequestFile {
-    originalname: string;
-    mimetype: string;
-    size: number;
+    requestFileUrl?: UrlObject;
 }
 
 export class RequestContentDto implements IRequestContentDto {
@@ -27,34 +26,21 @@ export class RequestContentDto implements IRequestContentDto {
 
     public targetMimetype: EConversionFormats;
 
-    public requestFile: IRequestFile = {
-        originalname: null,
-        mimetype: null,
-        size: null,
-    };
+    public requestFile: File;
+
+    public requestFileUrl: UrlObject;
 
     constructor( targetMimetype: EConversionFormats, file: any ) {
         this.targetMimetype = targetMimetype;
-        this.sourceMimetype = this._detectFormat( file.mimetype );
-        this.requestFile.originalname = file.originalname;
-        this.requestFile.size = file.size;
-        this.requestFile.mimetype = file.mimetype;
+        this.sourceMimetype = DetectFormatUtils.detectFormat( file.mimetype );
     }
 
-    private _detectFormat( v: string ): EConversionFormats {
-        if ( RegExp( /doc/g, 'i' ).test( v ) ) {
-            return EConversionFormats.DOCX;
-        } else
-        if ( RegExp( /html/g, 'i' ).test( v ) ) {
-            return EConversionFormats.HTML;
-        } else
-        if ( RegExp( /pdf/g, 'i' ).test( v ) ) {
-            return EConversionFormats.PDF;
-        } else
-        if ( RegExp( /text/g, 'i' ).test( v ) ) {
-            return EConversionFormats.TEXT;
-        } else {
-            throw new Error( 'RequestContentDto._detectFormat: Incompatible Format!' );
-        }
+    /** return value */
+    public getResponseContentDto(): ResponseContentDto {
+        const response: ResponseContentDto = new ResponseContentDto();
+        response.sourceMimetype = this.sourceMimetype;
+        response.targetMimetype = this.targetMimetype;
+        return response;
     }
+
 }

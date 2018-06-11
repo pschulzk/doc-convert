@@ -21,30 +21,30 @@ import {
  *
  */
 
-export abstract class ConversionController {
+export abstract class AbstractController {
 
     /** -------------------------------------------------------------------------------------------
      * VARIABLES
      */ // ----------------------------------------------------------------------------------------
-    public targetMimetype: EConversionFormats;
 
     /** -------------------------------------------------------------------------------------------
      * METHODS
      */ // ----------------------------------------------------------------------------------------
-    /**
-     * @description inform about that this request is not available
-     * @returns {object}
-     */
-    @Get()
-    public default(): object {
-        const infoMessage: string
-            = 'No GET request available. POST document of type HTML, PDF or DOCX.';
 
-        return {
-            data: {
-                message: infoMessage,
-            },
-        };
-    }
+    // /**
+    //  * @description inform about that this request is not available
+    //  * @returns {object}
+    //  */
+    // @Get()
+    // public default(): object {
+    //     const infoMessage: string
+    //         = 'No GET request available. POST document of type HTML, PDF or DOCX.';
+
+    //     return {
+    //         data: {
+    //             message: infoMessage,
+    //         },
+    //     };
+    // }
 
 }

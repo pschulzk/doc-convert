@@ -17,6 +17,12 @@ export interface IResponseContentDto {
     targetDownloadUrl: URL;
 }
 
+export interface IResponseFile {
+    originalname: string;
+    mimetype: string;
+    size: number;
+}
+
 export class ResponseContentDto implements IResponseContentDto {
 
     public sourceMimetype: EConversionFormats;
