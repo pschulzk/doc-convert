@@ -3,6 +3,7 @@ import {
     Controller,
     FileInterceptor,
     Post,
+    Response,
     Query,
     UploadedFile,
     UseInterceptors,
@@ -60,7 +61,7 @@ export class ConverterController extends AbstractController {
      * @param {any} file uploaded file
      * @param {string} targetMimeType the file type the requesting source wants
      * the converted file to be of.
-     * @returns {Promise<object>}
+     * @returns {Promise<any>}
      */
     @Post()
     @UseInterceptors(
@@ -81,7 +82,8 @@ export class ConverterController extends AbstractController {
     public async upload(
         @UploadedFile() file,
         @Query( 'targetMimeType' ) targetMimeType: string,
-    ): Promise<object> {
+        @Response() res,
+    ): Promise<any> {
 
         // convert uploaded and stored file
         const conversionRequest: IConversionRequest = this.conversionRequestService
@@ -95,6 +97,7 @@ export class ConverterController extends AbstractController {
         };
 
         // send response
-        return response;
+        // return response;
+        return res.send( this.conversionRequestService.convertFile( conversionRequest.sourceFilePath ) );
     }
 }

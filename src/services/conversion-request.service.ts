@@ -3,6 +3,12 @@ import {
     Injectable,
 } from '@nestjs/common';
 
+/** NodeJS imports */
+import * as FS from 'fs';
+
+/** 3rd party imports */
+import * as XLSX from 'xlsx';
+
 /** Custom imports */
 import { IConversionRequest } from '../types';
 
@@ -33,6 +39,7 @@ export class ConversionRequestService {
     /** -------------------------------------------------------------------------------------------
      * METHODS
      */ // ----------------------------------------------------------------------------------------
+
     /**
      * @description Get response assembled from object properties.
      * @returns {object} response JSON
@@ -50,7 +57,39 @@ export class ConversionRequestService {
                 }
             });
 
+        this.readFile( sourceFilePath );
+
         return this.conversionRequest;
+    }
+
+    public convertFile( filePath: string ): Buffer {
+
+        const data = this.readFile( filePath );
+
+        // const workbook = XLSX.read( data, { type: 'buffer' } );
+
+        /* generate workbook */
+        const test: any[][] = [ [ 1, 2, 3 ], [ 1, 2, 3 ], [ 1, 2, 3 ] ];
+        const worksheet = XLSX.utils.aoa_to_sheet(test);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet( workbook, worksheet, 'SheetJS' );
+
+        /* generate buffer */
+        return XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' } );
+    }
+
+    public async readFile( filePath: string ): Promise<any> {
+        return await FS.readFile(
+            filePath,
+            ( error: Error, data: Buffer ) => {
+                if ( error ) {
+                    console.error( 'ConversionRequestService.readFile:', error );
+                } else if ( data ) {
+                    console.log( 'ConversionRequestService.readFile:', data );
+                    return data;
+                }
+            },
+        );
     }
 
 }

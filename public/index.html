@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>TEST</title>
+</head>
+<body>
+    <h1>TEST</h1>
+    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Iste dolore laudantium at iure voluptatum aspernatur sapiente sunt rerum omnis neque velit tenetur illum impedit commodi, eveniet molestiae repellat atque vitae.</p>
+    <form
+        id="form"
+        action="#"
+        method="POST"
+        enctype="multipart/form-data"
+    >
+    <input type="file" name="file" id="file">
+    
+    <button type="submit">Submit</button>
+</form>
+
+<pre id="response-box">
+</pre>
+
+<script>
+
+    var form;
+    var uploadFile;
+    var response;
+    var responseBox;
+    var formData = new FormData();
+    var oReq = new XMLHttpRequest();
+
+    window.onload = function() {
+        console.log( '!!! ONLOAD' );
+        form = document.querySelector('#form');
+        responseBox = document.querySelector('#response-box');
+        form.onsubmit = submitted.bind(form);
+    }
+
+    function submitted(event) {
+        console.log( '!!! files:', event.target[ 0 ].files[ 0 ] );
+        
+        event.preventDefault();
+
+        response = event;
+
+        uploadFile = event.target[ 0 ].files[ 0 ];
+        formData.append( 'file', uploadFile );
+
+        responseBox.innerHtml = response;
+
+        upload();
+    }
+
+    function upload() {
+        oReq.addEventListener('load', reqListener);
+        oReq.open(
+            'POST',
+            'http://localhost:3000/convert?targetMimeType=application%2Fvnd.ms-excel'
+        );
+    oReq.send( formData );
+    }
+    
+    function reqListener () {
+        console.log( '!!!!! responseText:', this.responseText );
+    }
+
+</script>
+</body>
+</html>
