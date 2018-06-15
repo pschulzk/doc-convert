@@ -1,5 +1,15 @@
+/** NEST imports */
+import {
+    Injectable,
+} from '@nestjs/common';
+
+/** Custom imports */
 import { IConversionRequest } from '../types';
 
+/**
+ * @description Service for creating and managing ConversionRequests
+ */
+@Injectable()
 export class ConversionRequestService {
 
     /** -------------------------------------------------------------------------------------------
