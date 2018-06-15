@@ -1,50 +1,40 @@
-import { EConversionFormats } from './conversion-formats.type';
-import { ResponseContentDto } from './response-content-dto.type';
-import { UrlObject } from 'url';
-import { DetectFormatUtils } from '../utils';
-
 /**
- *
- * Will be created from request to POST:/convert path
- *
+ * @description Will be created from request to POST:/file/convert controller.
  */
+export class RequestContentDto {
 
-export interface IRequestContentDto {
-    /** file format of document sent */
-    sourceMimetype: any;
-    /** desired format to be returned */
-    targetMimetype: EConversionFormats;
-    /** original document file */
-    requestFile?: File;
-    /** download URI of original document file */
-    requestFileUrl?: UrlObject;
-}
+    /** -------------------------------------------------------------------------------------------
+     * VARIABLES
+     */ // ----------------------------------------------------------------------------------------
 
-export class RequestContentDto implements IRequestContentDto {
+    public sourceMimetype: string;
 
-    public sourceMimetype: any;
+    public targetMimetype: string;
 
-    public targetMimetype: EConversionFormats;
+    public sourceFilePath: string;
 
-    public requestFile: any;
+    public targetFilePath: string;
 
-    public convertedFile: any;
-
-    public requestFileUrl: UrlObject;
-
-    constructor( file: any, targetMimetype: EConversionFormats,  ) {
-        this.requestFile = file;
+    /** -------------------------------------------------------------------------------------------
+     * CONSTRUCTOR
+     */ // ----------------------------------------------------------------------------------------
+    constructor( sourceFilePath: string, targetMimetype: string ) {
+        this.sourceFilePath = sourceFilePath;
         this.targetMimetype = targetMimetype;
-        this.sourceMimetype = DetectFormatUtils.detectFormat( file.mimetype );
     }
 
-    /** return value */
-    public getResponseContentDto(): ResponseContentDto {
-        const response: ResponseContentDto = new ResponseContentDto();
-        response.sourceMimetype = this.sourceMimetype;
-        response.targetMimetype = this.targetMimetype;
-        response.convertedFile = this.convertedFile;
-        return response;
+    /** -------------------------------------------------------------------------------------------
+     * METHODS
+     */ // ----------------------------------------------------------------------------------------
+    /**
+     * @description Get response assembled from object properties.
+     * @returns {object} response JSON
+     */
+    public getResponse(): object {
+        return {
+            sourceFilePath: this.sourceFilePath,
+            targetMimetype: this.targetMimetype,
+        };
     }
 
 }

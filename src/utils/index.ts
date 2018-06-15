@@ -1,1 +1,1 @@
-export * from './detect-format.utils';
+export * from './common.utils';
