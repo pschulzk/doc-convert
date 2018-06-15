@@ -1,1 +1,1 @@
-export * from './request-content-dto.type';
+export * from './conversion-request.type';

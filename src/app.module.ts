@@ -1,16 +1,26 @@
+/** NestJS imports */
 import { Module } from '@nestjs/common';
 
+/** Services */
 import {
-  RootController,
-  ConverterController,
-} from './controllers';
+    ConversionRequestService,
+} from './services';
 
-@Module({
-  imports: [],
-  controllers: [
+/** Controllers */
+import {
     RootController,
     ConverterController,
-  ],
-  providers: [],
+} from './controllers';
+
+/** Module */
+@Module({
+    imports: [],
+    controllers: [
+        RootController,
+        ConverterController,
+    ],
+    providers: [
+        ConversionRequestService,
+    ],
 })
 export class AppModule {}

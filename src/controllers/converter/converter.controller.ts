@@ -15,12 +15,16 @@ import * as PATH from 'path';
 
 /** CUSTOM imports */
 import {
-    RequestContentDto,
+    IConversionRequest,
 } from '../../types';
 
 import {
     CommonUtils,
 } from '../../utils';
+
+import {
+    ConversionRequestService,
+} from '../../services';
 
 import { AbstractController } from '../../classes';
 
@@ -35,13 +39,15 @@ export class ConverterController extends AbstractController {
      * VARIABLES
      */ // ----------------------------------------------------------------------------------------
 
-     /** relative filesystem path where to store uploads from this controller */
-     public uploadPath: string = './uploads';
+    /** relative filesystem path where to store uploads from this controller */
+    public uploadPath: string = './uploads';
 
     /** -------------------------------------------------------------------------------------------
      * CONSTRUCTOR
      */ // ----------------------------------------------------------------------------------------
-    constructor() {
+    constructor(
+        protected conversionRequestService: ConversionRequestService,
+    ) {
         super();
     }
 
@@ -51,6 +57,9 @@ export class ConverterController extends AbstractController {
 
     /**
      * @description recieve conversion request data and provide response
+     * @param {any} file uploaded file
+     * @param {string} targetMimeType the file type the requesting source wants
+     * the converted file to be of.
      * @returns {Promise<object>}
      */
     @Post()
@@ -59,12 +68,12 @@ export class ConverterController extends AbstractController {
             storage: diskStorage({
                 destination: './uploads',
                 filename: (req, file, cb) => {
-                  const fileName: string = PATH.parse(file.originalname).name;
-                  const fileExtension: string = PATH.parse(file.originalname).ext;
-                  const uniqueId: string = CommonUtils.getUniqueId();
-                  const fileIdentifier: string = `${fileName}-${uniqueId}${fileExtension}`;
+                    const fileName: string = PATH.parse(file.originalname).name;
+                    const fileExtension: string = PATH.parse(file.originalname).ext;
+                    const uniqueId: string = CommonUtils.getUniqueId();
+                    const fileIdentifier: string = `${fileName}-${uniqueId}${fileExtension}`;
 
-                  cb( null, fileIdentifier );
+                    cb( null, fileIdentifier );
                 },
             }),
         }),
@@ -73,17 +82,19 @@ export class ConverterController extends AbstractController {
         @UploadedFile() file,
         @Query( 'targetMimeType' ) targetMimeType: string,
     ): Promise<object> {
-        // console.log( '!!! FILE:', file );
 
-        const requestContentDto: RequestContentDto
-            = new RequestContentDto( file.path, targetMimeType );
+        // convert uploaded and stored file
+        const conversionRequest: IConversionRequest = this.conversionRequestService
+        .createConversion( file.path, targetMimeType );
 
+        // create response
         const response: object = {
             data: {
-                requestResponse: requestContentDto.getResponse(),
+                requestResponse: conversionRequest,
             },
         };
 
+        // send response
         return response;
     }
 }
