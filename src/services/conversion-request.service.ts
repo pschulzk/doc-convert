@@ -49,22 +49,22 @@ export class ConversionRequestService {
         this.conversionRequest.sourceFilePath = sourceFilePath;
         this.conversionRequest.targetMimetype = targetMimetype;
 
-        // check object for completion
-        Object.getOwnPropertyNames( this.conversionRequest )
-            .forEach( (property: string) => {
-                if ( this.conversionRequest[ property ] === null ) {
-                    console.warn( 'conversionRequest incomplete:', this.conversionRequest );
-                }
-            });
+        // // check object for completion
+        // Object.getOwnPropertyNames( this.conversionRequest )
+        //     .forEach( (property: string) => {
+        //         if ( this.conversionRequest[ property ] === null ) {
+        //             console.warn( 'conversionRequest incomplete:', this.conversionRequest );
+        //         }
+        //     });
 
-        this.readFile( sourceFilePath );
+        this.convertFile( sourceFilePath );
 
         return this.conversionRequest;
     }
 
-    public convertFile( filePath: string ): Buffer {
+    public convertFile( filePath: string ): void {
 
-        const data = this.readFile( filePath );
+        // const data = this.readFile( filePath );
 
         // const workbook = XLSX.read( data, { type: 'buffer' } );
 
@@ -74,8 +74,20 @@ export class ConversionRequestService {
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet( workbook, worksheet, 'SheetJS' );
 
-        /* generate buffer */
-        return XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' } );
+        // save file
+        const targetFilePath: string = filePath.replace( /public/gi, 'downloads' );
+        console.log( 'targetFilePath:', targetFilePath );
+        FS.writeFile(
+            filePath,
+            XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' } ),
+            ( error: Error ) => {
+                if ( error ) {
+                    console.error( 'ConversionRequestService.convertFile:', error );
+                } else {
+                    console.log( 'ConversionRequestService.convertFile: SUCCESS' );
+                }
+            },
+        );
     }
 
     public async readFile( filePath: string ): Promise<any> {

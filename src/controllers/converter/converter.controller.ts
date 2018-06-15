@@ -10,9 +10,9 @@ import {
 } from '@nestjs/common';
 
 /** NodeJS imports */
-import { diskStorage } from 'multer';
-
+import * as FS from 'fs';
 import * as PATH from 'path';
+import { diskStorage } from 'multer';
 
 /** CUSTOM imports */
 import {
@@ -85,9 +85,12 @@ export class ConverterController extends AbstractController {
         @Response() res,
     ): Promise<any> {
 
+        console.log( 'FILEPATH:', file.path );
+        
+
         // convert uploaded and stored file
         const conversionRequest: IConversionRequest = this.conversionRequestService
-        .createConversion( file.path, targetMimeType );
+            .createConversion( file.path, targetMimeType );
 
         // create response
         const response: object = {
@@ -97,7 +100,19 @@ export class ConverterController extends AbstractController {
         };
 
         // send response
-        // return response;
-        return res.send( this.conversionRequestService.convertFile( conversionRequest.sourceFilePath ) );
+        return response;
+
+        // res.set('Content-Type', 'application/vnd.ms-excel');
+        // res.setHeader('Content-Disposition', 'attachment; filename="test.xlsx"');
+        // const filestream = FS.createReadStream(
+        //     this.conversionRequestService
+        //         .convertFile( conversionRequest.sourceFilePath ),
+        // );
+        // filestream.pipe(res);
+
+        // return res.send(
+        //     this.conversionRequestService
+        //         .convertFile( conversionRequest.sourceFilePath ),
+        // );
     }
 }

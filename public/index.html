@@ -34,8 +34,8 @@
 
     window.onload = function() {
         console.log( '!!! ONLOAD' );
-        form = document.querySelector('#form');
-        responseBox = document.querySelector('#response-box');
+        form = document.getElementById('form');
+        responseBox = document.getElementById('response-box');
         form.onsubmit = submitted.bind(form);
     }
 
@@ -58,13 +58,15 @@
         oReq.addEventListener('load', reqListener);
         oReq.open(
             'POST',
-            'http://localhost:3000/convert?targetMimeType=application%2Fvnd.ms-excel'
+            'http://localhost:3000/file/convert?targetMimeType=application%2Fvnd.ms-excel'
         );
-    oReq.send( formData );
+        oReq.send( formData );
     }
     
     function reqListener () {
         console.log( '!!!!! responseText:', this.responseText );
+
+        // var blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
     }
 
 </script>
