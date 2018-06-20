@@ -1,1 +1,1 @@
-export * from './conversion-request.type';
+export * from './conversion.type';

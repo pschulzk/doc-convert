@@ -2,21 +2,21 @@
 import {
     Controller,
     FileInterceptor,
+    HttpCode,
+    HttpStatus,
     Post,
-    Response,
     Query,
     UploadedFile,
     UseInterceptors,
 } from '@nestjs/common';
 
 /** NodeJS imports */
-import * as FS from 'fs';
 import * as PATH from 'path';
 import { diskStorage } from 'multer';
 
 /** CUSTOM imports */
 import {
-    IConversionRequest,
+    IConversion,
 } from '../../types';
 
 import {
@@ -43,6 +43,9 @@ export class ConverterController extends AbstractController {
     /** relative filesystem path where to store uploads from this controller */
     public uploadPath: string = './uploads';
 
+    /** relative filesystem path where to store converted files for download */
+    public downloadPath: string = './downloads/';
+
     /** -------------------------------------------------------------------------------------------
      * CONSTRUCTOR
      */ // ----------------------------------------------------------------------------------------
@@ -67,7 +70,7 @@ export class ConverterController extends AbstractController {
     @UseInterceptors(
         FileInterceptor( 'file', {
             storage: diskStorage({
-                destination: './uploads',
+                destination: this.uploadPath,
                 filename: (req, file, cb) => {
                     const fileName: string = PATH.parse(file.originalname).name;
                     const fileExtension: string = PATH.parse(file.originalname).ext;
@@ -79,37 +82,24 @@ export class ConverterController extends AbstractController {
             }),
         }),
     )
+    @HttpCode( HttpStatus.OK )
     public async upload(
         @UploadedFile() file,
         @Query( 'targetMimeType' ) targetMimeType: string,
-        @Response() res,
     ): Promise<any> {
 
         // convert uploaded and stored file
-        const conversionRequest: IConversionRequest = this.converterService
-            .createConversion( file.path, targetMimeType, './downloads/' );
-
-        // create response
-        const response: object = {
-            data: {
-                requestResponse: conversionRequest,
-            },
-        };
-
-        // send response
-        return response;
-
-        // res.set('Content-Type', 'application/vnd.ms-excel');
-        // res.setHeader('Content-Disposition', 'attachment; filename="test.xlsx"');
-        // const filestream = FS.createReadStream(
-        //     this.converterService
-        //         .convertFile( conversionRequest.sourceFilePath ),
-        // );
-        // filestream.pipe(res);
-
-        // return res.send(
-        //     this.converterService
-        //         .convertFile( conversionRequest.sourceFilePath ),
-        // );
+        return this.converterService
+            .createConversion(
+                file.path,
+                targetMimeType,
+                this.downloadPath,
+            )
+            .then( (reponse: IConversion) => {
+                // create response
+                return {
+                    data: reponse,
+                };
+            });
     }
 }

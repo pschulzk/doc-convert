@@ -4,13 +4,14 @@ import {
 } from '@nestjs/common';
 
 /** NodeJS imports */
+import * as PATH from 'path';
 import * as FS from 'fs';
 
 /** 3rd party imports */
 import * as XLSX from 'xlsx';
 
 /** Custom imports */
-import { IConversionRequest } from '../types';
+import { IConversion } from '../types';
 
 /**
  * @description Service for creating and managing ConversionRequests
@@ -22,7 +23,7 @@ export class ConverterService {
      * VARIABLES
      */ // ----------------------------------------------------------------------------------------
 
-    public conversionRequest: IConversionRequest = {
+    public conversionRequest: IConversion = {
         sourceMimetype: null,
         targetMimetype: null,
         sourceFilePath: null,
@@ -47,44 +48,53 @@ export class ConverterService {
      * @param {string} sourceFilePath filesystem path to file}
      * @param {string} targetMimetype file type to convert to
      * @param {string} targetFolderPath filesystem target path to folder
-     * @returns {IConversionRequest} object containing requested information
+     * @returns {IConversion} object containing requested information
      */
     public createConversion(
         sourceFilePath: string,
         targetMimetype: string,
         targetFolderPath: string,
-    ): IConversionRequest {
+    ): Promise<IConversion> {
 
         // assign response properties
         this.conversionRequest.sourceFilePath = sourceFilePath;
-        this.conversionRequest.targetMimetype = targetMimetype;
-
         // extract file name from sourceFilePath
         const fileName: string = sourceFilePath.split( '/' ).pop();
-        // define new file path to target folder
-        this.conversionRequest.targetFilePath = targetFolderPath + fileName;
-        // console.log( '!!! conversionRequest.targetFilePath:', this.conversionRequest.targetFilePath );
+
+        this.conversionRequest.sourceMimetype = PATH.extname( fileName );
+        this.conversionRequest.targetMimetype = targetMimetype;
 
         // read file from source
-        this.readFile( this.conversionRequest.sourceFilePath )
+        return this.readFile( this.conversionRequest.sourceFilePath )
             .then( ( uploadedFile ) => {
-
-                // save read file to path
-                this.writeFile(
-                    this.conversionRequest.targetFilePath,
-                    this.convertFile( uploadedFile ), // actually convert file
+                // convert file
+                return this.convertFile(
+                    uploadedFile,
+                    this.conversionRequest.targetMimetype,
                 );
+            })
+            .then( (convertedFile: Buffer) => {
+                // save read file to path
+                return this.writeFile(
+                    targetFolderPath + fileName,
+                    convertedFile,
+                );
+            })
+            .then( () => {
+                // // check object for completion
+                // Object.getOwnPropertyNames( this.conversionRequest )
+                //     .forEach( (property: string) => {
+                //         if ( this.conversionRequest[ property ] === null ) {
+                //             console.warn( 'conversionRequest incomplete:', this.conversionRequest );
+                //         }
+                //     });
+
+                // get new file path to target folder
+                this.conversionRequest.targetFilePath = targetFolderPath + fileName;
+
+                // return final response
+                return this.conversionRequest;
             });
-
-        // // check object for completion
-        // Object.getOwnPropertyNames( this.conversionRequest )
-        //     .forEach( (property: string) => {
-        //         if ( this.conversionRequest[ property ] === null ) {
-        //             console.warn( 'conversionRequest incomplete:', this.conversionRequest );
-        //         }
-        //     });
-
-        return this.conversionRequest;
     }
 
     /**
@@ -125,7 +135,10 @@ export class ConverterService {
                 ( error: Error, data: Buffer ) => {
                     if ( error ) {
                         reject(
-                            console.error( 'ConverterService.readFile::FS.readFile:', error ),
+                            new Error(
+                                'ConverterService.readFile(): Cannot read file from: '
+                                + filePath,
+                            ),
                         );
                     } else if ( data ) {
                         return resolve( data );
@@ -139,7 +152,8 @@ export class ConverterService {
      * @description write file to filesystem
      *
      * @param {string} targetFilePath filesystem target path to folder
-     * @param {Buffer} file
+     * @param {Buffer} file buffer to write to filesystem
+     * @return {Promise<void>} Resolve when done writing file
      */
     public writeFile(
         targetFilePath: string,
@@ -151,9 +165,14 @@ export class ConverterService {
                 file,
                 ( error: Error ) => {
                     if ( error ) {
-                        reject( console.error( 'ConverterService.convertFile:', error ) );
+                        reject(
+                            new Error(
+                                'ConverterService.writeFile: Cannot write file to path: '
+                                + targetFilePath,
+                            ),
+                        );
                     } else {
-                        console.log( 'ConverterService.convertFile: SUCCESS' );
+                        // console.log( 'ConverterService.writeFile: SUCCESS' );
                         resolve();
                     }
                 },
