@@ -3,16 +3,16 @@ import {
     Injectable,
 } from '@nestjs/common';
 
-/** NodeJS imports */
-// import * as PATH from 'path';
-import * as FS from 'fs';
-
 /** 3rd party imports */
 import * as Mime from 'mime-types';
 // import * as XLSX from 'xlsx';
 
 /** Custom imports */
 import { IConversion } from '../types';
+
+import {
+    CommonUtils,
+} from '../utils';
 
 /**
  * @description Service for creating and managing ConversionRequests
@@ -58,15 +58,21 @@ export class ConverterService {
     ): Promise<IConversion> {
 
         // assign response properties
-        this.conversion.sourceFilePath = sourceFilePath;
         // extract file name from sourceFilePath
         const fileName: string = sourceFilePath.split( '/' ).pop();
-
+        this.conversion.sourceFilePath = sourceFilePath;
         this.conversion.sourceMimetype = Mime.lookup( fileName );
         this.conversion.targetMimetype = targetMimetype;
+        // conform filename extension
+        const newFileName: string = fileName.replace(
+            Mime.extension( this.conversion.sourceMimetype ),
+            Mime.extension( this.conversion.targetMimetype ),
+        );
+        // assemble target file path with new extension
+        this.conversion.targetFilePath = targetFolderPath + newFileName;
 
         // read file from source
-        return this.readFile( this.conversion.sourceFilePath )
+        return CommonUtils.readFile( this.conversion.sourceFilePath )
             .then( ( uploadedFile ) => {
                 // convert file
                 return this.convertFile(
@@ -76,31 +82,25 @@ export class ConverterService {
             })
             .then( (convertedFile: Buffer) => {
 
-                // conform filename extension
-                const newFileName: string = fileName.replace(
-                    Mime.extension( this.conversion.sourceMimetype ),
-                    Mime.extension( this.conversion.targetMimetype ),
-                );
-                console.log( '!!!! newFileName:', newFileName );
-
                 // save read file to path
-                return this.writeFile(
+                return CommonUtils.writeFile(
                     // targetFolderPath + fileName,
-                    targetFolderPath + newFileName,
+                    this.conversion.targetFilePath,
                     convertedFile,
                 );
             })
             .then( () => {
-                // // check object for completion
-                // Object.getOwnPropertyNames( this.conversion )
-                //     .forEach( (property: string) => {
-                //         if ( this.conversion[ property ] === null ) {
-                //             console.warn( 'conversion incomplete:', this.conversion );
-                //         }
-                //     });
 
-                // get new file path to target folder
-                this.conversion.targetFilePath = targetFolderPath + fileName;
+                // check object for completion
+                Object.getOwnPropertyNames( this.conversion )
+                    .forEach( (property: string) => {
+                        if ( this.conversion[ property ] === null ) {
+                            throw new Error(
+                                'Conversion property incomplete:'
+                                + property,
+                            );
+                        }
+                    });
 
                 // return final response
                 return this.conversion;
@@ -128,66 +128,6 @@ export class ConverterService {
         // const worksheet = XLSX.utils.aoa_to_sheet(test);
         // const workbook = XLSX.utils.book_new();
         // XLSX.utils.book_append_sheet( workbook, worksheet, 'SheetJS' );
-    }
-
-    /**
-     * @description read file from filesystem
-     *
-     * @param {string} filePath filesystem path to file
-     * @return {Promise<Buffer>} Asynchronous file buffer
-     */
-    public readFile(
-        filePath: string,
-    ): Promise<Buffer> {
-        return new Promise( ( resolve, reject ) => {
-            FS.readFile(
-                filePath,
-                ( error: Error, data: Buffer ) => {
-                    if ( error ) {
-                        reject(
-                            new Error(
-                                'ConverterService.readFile(): Cannot read file from: '
-                                + filePath,
-                            ),
-                        );
-                    } else if ( data ) {
-                        return resolve( data );
-                    }
-                },
-            );
-        });
-    }
-
-    /**
-     * @description write file to filesystem
-     *
-     * @param {string} targetFilePath filesystem target path to folder
-     * @param {Buffer} file buffer to write to filesystem
-     * @return {Promise<void>} Resolve when done writing file
-     */
-    public writeFile(
-        targetFilePath: string,
-        file: Buffer,
-    ): Promise<void> {
-        return new Promise( ( resolve, reject ) => {
-            FS.writeFile(
-                targetFilePath,
-                file,
-                ( error: Error ) => {
-                    if ( error ) {
-                        reject(
-                            new Error(
-                                'ConverterService.writeFile: Cannot write file to path: '
-                                + targetFilePath,
-                            ),
-                        );
-                    } else {
-                        // console.log( 'ConverterService.writeFile: SUCCESS' );
-                        resolve();
-                    }
-                },
-            );
-        });
     }
 
 }
