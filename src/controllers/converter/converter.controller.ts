@@ -24,7 +24,7 @@ import {
 } from '../../utils';
 
 import {
-    ConversionRequestService,
+    ConverterService,
 } from '../../services';
 
 import { AbstractController } from '../../classes';
@@ -47,7 +47,7 @@ export class ConverterController extends AbstractController {
      * CONSTRUCTOR
      */ // ----------------------------------------------------------------------------------------
     constructor(
-        protected conversionRequestService: ConversionRequestService,
+        protected converterService: ConverterService,
     ) {
         super();
     }
@@ -85,12 +85,9 @@ export class ConverterController extends AbstractController {
         @Response() res,
     ): Promise<any> {
 
-        console.log( 'FILEPATH:', file.path );
-        
-
         // convert uploaded and stored file
-        const conversionRequest: IConversionRequest = this.conversionRequestService
-            .createConversion( file.path, targetMimeType );
+        const conversionRequest: IConversionRequest = this.converterService
+            .createConversion( file.path, targetMimeType, './downloads/' );
 
         // create response
         const response: object = {
@@ -105,13 +102,13 @@ export class ConverterController extends AbstractController {
         // res.set('Content-Type', 'application/vnd.ms-excel');
         // res.setHeader('Content-Disposition', 'attachment; filename="test.xlsx"');
         // const filestream = FS.createReadStream(
-        //     this.conversionRequestService
+        //     this.converterService
         //         .convertFile( conversionRequest.sourceFilePath ),
         // );
         // filestream.pipe(res);
 
         // return res.send(
-        //     this.conversionRequestService
+        //     this.converterService
         //         .convertFile( conversionRequest.sourceFilePath ),
         // );
     }

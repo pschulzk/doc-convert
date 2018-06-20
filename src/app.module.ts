@@ -3,7 +3,7 @@ import { Module } from '@nestjs/common';
 
 /** Services */
 import {
-    ConversionRequestService,
+    ConverterService,
 } from './services';
 
 /** Controllers */
@@ -20,7 +20,7 @@ import {
         ConverterController,
     ],
     providers: [
-        ConversionRequestService,
+        ConverterService,
     ],
 })
 export class AppModule {}
