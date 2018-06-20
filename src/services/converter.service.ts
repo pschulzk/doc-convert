@@ -4,11 +4,12 @@ import {
 } from '@nestjs/common';
 
 /** NodeJS imports */
-import * as PATH from 'path';
+// import * as PATH from 'path';
 import * as FS from 'fs';
 
 /** 3rd party imports */
-import * as XLSX from 'xlsx';
+import * as Mime from 'mime-types';
+// import * as XLSX from 'xlsx';
 
 /** Custom imports */
 import { IConversion } from '../types';
@@ -23,7 +24,7 @@ export class ConverterService {
      * VARIABLES
      */ // ----------------------------------------------------------------------------------------
 
-    public conversionRequest: IConversion = {
+    public conversion: IConversion = {
         sourceMimetype: null,
         targetMimetype: null,
         sourceFilePath: null,
@@ -57,43 +58,52 @@ export class ConverterService {
     ): Promise<IConversion> {
 
         // assign response properties
-        this.conversionRequest.sourceFilePath = sourceFilePath;
+        this.conversion.sourceFilePath = sourceFilePath;
         // extract file name from sourceFilePath
         const fileName: string = sourceFilePath.split( '/' ).pop();
 
-        this.conversionRequest.sourceMimetype = PATH.extname( fileName );
-        this.conversionRequest.targetMimetype = targetMimetype;
+        this.conversion.sourceMimetype = Mime.lookup( fileName );
+        this.conversion.targetMimetype = targetMimetype;
 
         // read file from source
-        return this.readFile( this.conversionRequest.sourceFilePath )
+        return this.readFile( this.conversion.sourceFilePath )
             .then( ( uploadedFile ) => {
                 // convert file
                 return this.convertFile(
                     uploadedFile,
-                    this.conversionRequest.targetMimetype,
+                    this.conversion.targetMimetype,
                 );
             })
             .then( (convertedFile: Buffer) => {
+
+                // conform filename extension
+                const newFileName: string = fileName.replace(
+                    Mime.extension( this.conversion.sourceMimetype ),
+                    Mime.extension( this.conversion.targetMimetype ),
+                );
+                console.log( '!!!! newFileName:', newFileName );
+
                 // save read file to path
                 return this.writeFile(
-                    targetFolderPath + fileName,
+                    // targetFolderPath + fileName,
+                    targetFolderPath + newFileName,
                     convertedFile,
                 );
             })
             .then( () => {
                 // // check object for completion
-                // Object.getOwnPropertyNames( this.conversionRequest )
+                // Object.getOwnPropertyNames( this.conversion )
                 //     .forEach( (property: string) => {
-                //         if ( this.conversionRequest[ property ] === null ) {
-                //             console.warn( 'conversionRequest incomplete:', this.conversionRequest );
+                //         if ( this.conversion[ property ] === null ) {
+                //             console.warn( 'conversion incomplete:', this.conversion );
                 //         }
                 //     });
 
                 // get new file path to target folder
-                this.conversionRequest.targetFilePath = targetFolderPath + fileName;
+                this.conversion.targetFilePath = targetFolderPath + fileName;
 
                 // return final response
-                return this.conversionRequest;
+                return this.conversion;
             });
     }
 
