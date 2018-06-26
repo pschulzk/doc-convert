@@ -17,7 +17,7 @@ export class CommonUtils {
     }
 
     /**
-     * @description read file from filesystem
+     * @description Read file from filesystem
      *
      * @param {string} filePath filesystem path to file
      * @return {Promise<Buffer>} Asynchronous file buffer
@@ -45,7 +45,7 @@ export class CommonUtils {
     }
 
     /**
-     * @description write file to filesystem
+     * @description Write file to filesystem
      *
      * @param {string} targetFilePath filesystem target path to folder
      * @param {Buffer} file buffer to write to filesystem

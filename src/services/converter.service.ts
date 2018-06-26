@@ -56,6 +56,9 @@ export class ConverterService {
         targetMimetype: string,
         targetFolderPath: string,
     ): Promise<IConversion> {
+        console.log( '!!! ConverterService.createConversion: sourceFilePath:', sourceFilePath );
+        console.log( '!!! ConverterService.createConversion: targetMimetype:', targetMimetype );
+        console.log( '!!! ConverterService.createConversion: targetFolderPath:', targetFolderPath );
 
         // assign response properties
         // extract file name from sourceFilePath
@@ -80,17 +83,14 @@ export class ConverterService {
                     this.conversion.targetMimetype,
                 );
             })
-            .then( (convertedFile: Buffer) => {
-
+            .then( ( convertedFile: Buffer ) => {
                 // save read file to path
                 return CommonUtils.writeFile(
-                    // targetFolderPath + fileName,
                     this.conversion.targetFilePath,
                     convertedFile,
                 );
             })
             .then( () => {
-
                 // check object for completion
                 Object.getOwnPropertyNames( this.conversion )
                     .forEach( (property: string) => {
@@ -101,6 +101,8 @@ export class ConverterService {
                             );
                         }
                     });
+
+                this.conversion.targetFilePath = newFileName;
 
                 // return final response
                 return this.conversion;

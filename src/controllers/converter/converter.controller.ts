@@ -5,7 +5,7 @@ import {
     HttpCode,
     HttpStatus,
     Post,
-    Query,
+    Request,
     UploadedFile,
     UseInterceptors,
 } from '@nestjs/common';
@@ -44,7 +44,7 @@ export class ConverterController extends AbstractController {
     public uploadPath: string = './uploads';
 
     /** relative filesystem path where to store converted files for download */
-    public downloadPath: string = './downloads/';
+    public downloadPath: string = './public/';
 
     /** -------------------------------------------------------------------------------------------
      * CONSTRUCTOR
@@ -60,9 +60,9 @@ export class ConverterController extends AbstractController {
      */ // ----------------------------------------------------------------------------------------
 
     /**
-     * @description recieve conversion request data and provide response
-     * @param {any} file uploaded file
-     * @param {string} targetMimeType the file type the requesting source wants
+     * @description Recieve conversion request data and provide response
+     * @param {any} file Uploaded file
+     * @param {string} targetMimeType The file type the requesting source wants
      * the converted file to be of.
      * @returns {Promise<any>}
      */
@@ -85,14 +85,17 @@ export class ConverterController extends AbstractController {
     @HttpCode( HttpStatus.OK )
     public async upload(
         @UploadedFile() file,
-        @Query( 'targetMimeType' ) targetMimeType: string,
+        @Request() request,
     ): Promise<any> {
 
         // convert uploaded and stored file
         return this.converterService
             .createConversion(
+                // provide path of file
                 file.path,
-                targetMimeType,
+                // provide data type to converted to
+                request.body.targetMimeType,
+                // static path to save converted file
                 this.downloadPath,
             )
             .then( (reponse: IConversion) => {
