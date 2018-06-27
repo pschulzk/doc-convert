@@ -1,7 +1,6 @@
 import {
     Get,
     Controller,
-    Response,
 } from '@nestjs/common';
 
 @Controller()
@@ -13,11 +12,12 @@ export class RootController {
      */
     @Get()
     public root(
-        @Response() res,
-    ): object {
+    ): void {
 
-        // serve public index.html
-        return res.sendFile( '/index.html' );
+        // console.log( '!!!! ROOT req.body:', req.body );
+
+        // // serve public index.html
+        // return res.sendFile( '/' );
 
     }
 

@@ -389,4 +389,6 @@ Temporary Items
 # Local
 dokcer-compose.yml
 .env
-uploads/*
+public/*
+upload/*
+download/*

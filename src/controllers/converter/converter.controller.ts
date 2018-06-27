@@ -33,7 +33,7 @@ import { AbstractController } from '../../classes';
  * @description
  * Recieves files, converts them and responds with location of those converted files.
  */
-@Controller('file/convert')
+@Controller( 'file/convert' )
 export class ConverterController extends AbstractController {
 
     /** -------------------------------------------------------------------------------------------
@@ -41,10 +41,10 @@ export class ConverterController extends AbstractController {
      */ // ----------------------------------------------------------------------------------------
 
     /** relative filesystem path where to store uploads from this controller */
-    public uploadPath: string = './uploads';
+    public uploadPath: string = './upload';
 
     /** relative filesystem path where to store converted files for download */
-    public downloadPath: string = './public/';
+    public downloadPath: string = './download/';
 
     /** -------------------------------------------------------------------------------------------
      * CONSTRUCTOR
@@ -100,9 +100,7 @@ export class ConverterController extends AbstractController {
             )
             .then( (reponse: IConversion) => {
                 // create response
-                return {
-                    data: reponse,
-                };
+                return reponse;
             });
     }
 }

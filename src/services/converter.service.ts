@@ -56,9 +56,6 @@ export class ConverterService {
         targetMimetype: string,
         targetFolderPath: string,
     ): Promise<IConversion> {
-        console.log( '!!! ConverterService.createConversion: sourceFilePath:', sourceFilePath );
-        console.log( '!!! ConverterService.createConversion: targetMimetype:', targetMimetype );
-        console.log( '!!! ConverterService.createConversion: targetFolderPath:', targetFolderPath );
 
         // assign response properties
         // extract file name from sourceFilePath
@@ -71,8 +68,10 @@ export class ConverterService {
             Mime.extension( this.conversion.sourceMimetype ),
             Mime.extension( this.conversion.targetMimetype ),
         );
-        // assemble target file path with new extension
-        this.conversion.targetFilePath = targetFolderPath + newFileName;
+        // target file path string in local filesystem
+        const systemTargetFilePath: string = targetFolderPath + newFileName;
+        // target file path is filename with new extension under GET /
+        this.conversion.targetFilePath = newFileName;
 
         // read file from source
         return CommonUtils.readFile( this.conversion.sourceFilePath )
@@ -86,7 +85,7 @@ export class ConverterService {
             .then( ( convertedFile: Buffer ) => {
                 // save read file to path
                 return CommonUtils.writeFile(
-                    this.conversion.targetFilePath,
+                    systemTargetFilePath,
                     convertedFile,
                 );
             })
@@ -102,10 +101,11 @@ export class ConverterService {
                         }
                     });
 
-                this.conversion.targetFilePath = newFileName;
-
                 // return final response
                 return this.conversion;
+            })
+            .catch( (error: any) => {
+                throw new Error( 'createConversion():' + error );
             });
     }
 

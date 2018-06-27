@@ -10,6 +10,7 @@ import {
 import {
     RootController,
     ConverterController,
+    // DownloadController,
 } from './controllers';
 
 /** Module */
@@ -18,6 +19,7 @@ import {
     controllers: [
         RootController,
         ConverterController,
+        // DownloadController,
     ],
     providers: [
         ConverterService,
