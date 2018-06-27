@@ -24,7 +24,7 @@ import {
 } from '../../utils';
 
 import {
-    ConverterService,
+    ConvertService,
 } from '../../services';
 
 import { AbstractController } from '../../classes';
@@ -34,7 +34,7 @@ import { AbstractController } from '../../classes';
  * Recieves files, converts them and responds with location of those converted files.
  */
 @Controller( 'file/convert' )
-export class ConverterController extends AbstractController {
+export class FileConvertController extends AbstractController {
 
     /** -------------------------------------------------------------------------------------------
      * VARIABLES
@@ -50,7 +50,7 @@ export class ConverterController extends AbstractController {
      * CONSTRUCTOR
      */ // ----------------------------------------------------------------------------------------
     constructor(
-        protected converterService: ConverterService,
+        protected ConvertService: ConvertService,
     ) {
         super();
     }
@@ -89,7 +89,7 @@ export class ConverterController extends AbstractController {
     ): Promise<any> {
 
         // convert uploaded and stored file
-        return this.converterService
+        return this.ConvertService
             .createConversion(
                 // provide path of file
                 file.path,

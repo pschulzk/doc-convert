@@ -3,13 +3,13 @@ import { Module } from '@nestjs/common';
 
 /** Services */
 import {
-    ConverterService,
+    ConvertService,
 } from './services';
 
 /** Controllers */
 import {
     RootController,
-    ConverterController,
+    FileConvertController,
     // DownloadController,
 } from './controllers';
 
@@ -18,11 +18,11 @@ import {
     imports: [],
     controllers: [
         RootController,
-        ConverterController,
+        FileConvertController,
         // DownloadController,
     ],
     providers: [
-        ConverterService,
+        ConvertService,
     ],
 })
 export class AppModule {}

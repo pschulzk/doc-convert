@@ -18,7 +18,7 @@ import {
  * @description Service for creating and managing ConversionRequests
  */
 @Injectable()
-export class ConverterService {
+export class ConvertService {
 
     /** -------------------------------------------------------------------------------------------
      * VARIABLES
