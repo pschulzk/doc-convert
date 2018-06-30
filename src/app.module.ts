@@ -9,8 +9,8 @@ import {
 /** Controllers */
 import {
     RootController,
+    FileUploadController,
     FileConvertController,
-    // DownloadController,
 } from './controllers';
 
 /** Module */
@@ -18,8 +18,8 @@ import {
     imports: [],
     controllers: [
         RootController,
+        FileUploadController,
         FileConvertController,
-        // DownloadController,
     ],
     providers: [
         ConvertService,

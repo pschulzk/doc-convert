@@ -17,6 +17,67 @@ export class CommonUtils {
     }
 
     /**
+     * @description Assign objects and check for property safety.
+     * Needs object's properties to bee initialized with value of at least null.
+     * @param {any} request Request with conform request body
+     * @param {T} object Initialized class object with iteratable property values
+     * @returns {T} object assigned with request body's property values
+     */
+    public static getObjectFromDTO<T>(
+        request: any,
+        object: T,
+    ): T {
+        // get request body
+        let requestBody;
+        if ( request.body ) {
+            requestBody = request.body;
+        } else {
+            throw new Error(
+                'CommonUtils.getObjectFromDTO(): Request has no body: ' + request,
+            );
+        }
+
+        // Get and assign properties
+        const returnValue: any = {};
+        Object.getOwnPropertyNames( object ).forEach( (key: string) => {
+            if ( requestBody[ key ] ) {
+                Object.assign( returnValue, { [ key ]: requestBody[ key ] } );
+            } else {
+                throw new Error(
+                    'CommonUtils.getObjectFromDTO(): Request.body is missing property: ' + key,
+                );
+            }
+        });
+
+        return returnValue as T;
+    }
+
+    /**
+     * @description Check object for allowed property values
+     *
+     * @param {object} object Object to be checked
+     * @return {boolean} If true, no property values is null or undefined
+     */
+    public static checkObjectValues( object: object ): boolean {
+        return Object.getOwnPropertyNames( object )
+            // If no value is null or undefined, return true
+            .map( (property: string) => {
+                if (
+                    typeof object[ property ] === 'undefined'
+                    || object[ property ] === null
+                ) {
+                    throw new Error(
+                        'Object property value not allowed:'
+                        + property,
+                    );
+                } else {
+                    return true;
+                }
+            })
+            .some( (arrVal: boolean) => ( arrVal === true ) );
+    }
+
+    /**
      * @description Read file from filesystem
      *
      * @param {string} filePath filesystem path to file

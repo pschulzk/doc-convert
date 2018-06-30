@@ -8,7 +8,13 @@ import * as Mime from 'mime-types';
 // import * as XLSX from 'xlsx';
 
 /** Custom imports */
-import { IConversion } from '../types';
+import {
+    IFileConvertRequestDTO,
+    FileConvertRequest,
+    IFileConvertResponseDTO,
+    FileConvertResponse,
+    EMimeType,
+} from '../types';
 
 import {
     CommonUtils,
@@ -24,12 +30,9 @@ export class ConvertService {
      * VARIABLES
      */ // ----------------------------------------------------------------------------------------
 
-    public conversion: IConversion = {
-        sourceMimetype: null,
-        targetMimetype: null,
-        sourceFilePath: null,
-        targetFilePath: null,
-    };
+    public fileConvertRequest: IFileConvertRequestDTO = new FileConvertRequest();
+
+    public fileConvertResponse: IFileConvertResponseDTO = new FileConvertResponse();
 
     // /** -------------------------------------------------------------------------------------------
     //  * CONSTRUCTOR
@@ -42,70 +45,70 @@ export class ConvertService {
      * METHODS
      */ // ----------------------------------------------------------------------------------------
 
+    public createFileConvertRequest( request: any ): IFileConvertRequestDTO {
+        // Instantiate with null property values
+        const fileConvertRequest: IFileConvertRequestDTO = new FileConvertRequest();
+        // Assign request body data and return
+        return CommonUtils.getObjectFromDTO<IFileConvertRequestDTO>( request, fileConvertRequest );
+    }
+
     /**
      * @description Read file to convert, convert it, store it to specified path and return
      * object with requested information.
      *
-     * @param {string} sourceFilePath filesystem path to file}
-     * @param {string} targetMimetype file type to convert to
-     * @param {string} targetFolderPath filesystem target path to folder
-     * @returns {IConversion} object containing requested information
+     * @param {IFileConvertRequestDTO} fileConvertRequest Object containing required values
+     * @param {string} targetFolderPath Filesystem target path to folder
+     * @returns {IFileConvertResponseDTO} Object containing requested information
      */
-    public createConversion(
-        sourceFilePath: string,
-        targetMimetype: string,
+    public createFileConvertResponse(
+        fileConvertRequest: IFileConvertRequestDTO,
         targetFolderPath: string,
-    ): Promise<IConversion> {
+    ): Promise<IFileConvertResponseDTO> {
 
-        // assign response properties
-        // extract file name from sourceFilePath
-        const fileName: string = sourceFilePath.split( '/' ).pop();
-        this.conversion.sourceFilePath = sourceFilePath;
-        this.conversion.sourceMimetype = Mime.lookup( fileName );
-        this.conversion.targetMimetype = targetMimetype;
-        // conform filename extension
-        const newFileName: string = fileName.replace(
-            Mime.extension( this.conversion.sourceMimetype ),
-            Mime.extension( this.conversion.targetMimetype ),
+        // Examine request data:
+        // Extract file name from source file URI
+        const fileName: string = fileConvertRequest.sourceFilePath.split( '/' ).pop();
+        const sourceMimetypeFromFileExtension = Mime.lookup( fileName );
+        // Exchange file extension
+        const convertedFileName: string = fileName.replace(
+            Mime.extension( sourceMimetypeFromFileExtension ),
+            Mime.extension( fileConvertRequest.targetMimetype ),
         );
-        // target file path string in local filesystem
-        const systemTargetFilePath: string = targetFolderPath + newFileName;
-        // target file path is filename with new extension under GET /
-        this.conversion.targetFilePath = newFileName;
+        // Target file path string in local filesystem
+        const systemSourceFilePath: string = fileConvertRequest.sourceFilePath;
+        const systemTargetFilePath: string = targetFolderPath + convertedFileName;
 
-        // read file from source
-        return CommonUtils.readFile( this.conversion.sourceFilePath )
+        // Assign response property values
+        this.fileConvertResponse.sourceFilePath = fileConvertRequest.sourceFilePath;
+        this.fileConvertResponse.sourceMimetype = sourceMimetypeFromFileExtension;
+        this.fileConvertResponse.targetMimetype = fileConvertRequest.targetMimetype;
+        this.fileConvertResponse.targetFilePath = convertedFileName;
+
+        // Read file from source
+        return CommonUtils.readFile( systemSourceFilePath )
             .then( ( uploadedFile ) => {
-                // convert file
+                // Convert file
                 return this.convertFile(
                     uploadedFile,
-                    this.conversion.targetMimetype,
+                    this.fileConvertResponse.targetMimetype,
                 );
             })
             .then( ( convertedFile: Buffer ) => {
-                // save read file to path
+                // Save read file to path
                 return CommonUtils.writeFile(
                     systemTargetFilePath,
                     convertedFile,
                 );
             })
             .then( () => {
-                // check object for completion
-                Object.getOwnPropertyNames( this.conversion )
-                    .forEach( (property: string) => {
-                        if ( this.conversion[ property ] === null ) {
-                            throw new Error(
-                                'Conversion property incomplete:'
-                                + property,
-                            );
-                        }
-                    });
-
-                // return final response
-                return this.conversion;
+                // Check object for completion
+                if ( CommonUtils.checkObjectValues( this.fileConvertResponse ) ) {
+                    // Return final response
+                    return this.fileConvertResponse;
+                }
             })
             .catch( (error: any) => {
-                throw new Error( 'createConversion():' + error );
+                throw new Error( 'ConvertService.createFileConvertResponse(): ' + error );
             });
     }
 
@@ -113,12 +116,12 @@ export class ConvertService {
      * @description Convert a file to target file type
      *
      * @param {string} fileToConvert file to convert
-     * @param {string} targetMimetype file type to convert to
+     * @param {EMimeType} targetMimetype file type to convert to
      * @return {Promise<Buffer>} Asynchronous file buffer
      */
     public convertFile(
         fileToConvert: any,
-        targetMimetype: string,
+        targetMimetype: EMimeType,
     ): Promise<Buffer> {
 
         return Promise.resolve( fileToConvert );
