@@ -2,7 +2,7 @@
 
 ## Description
 
-A document converter.
+A document converter service based on [NestJS](https://nestjs.com/).
 
 ## API paths
 ### convert to PDF
