@@ -9,26 +9,13 @@ A document converter.
 ```
 POST /convert-html-to-pdf
 ```
-#### Accepts
-```
-{
-  file: <DOCUMENT TO CONVERT>
-}
-```
-or
-```
-{
-  file: <DOCUMENT TO CONVERT>
-}
-```
-#### Responds
 
 ### convert to DOCX
+#### Request
 ```
 POST /convert-html-to-docx
 ```
-
-## Upload as multipart/form-data
+#### Body as multipart/form-data
 ```
 {
   file: <DOCUMENT TO CONVERT>
@@ -44,9 +31,6 @@ $ npm install
 ## Running the app
 
 ```bash
-# development
-$ npm run start
-
 # watch mode
 $ npm run start:dev
 
@@ -54,19 +38,5 @@ $ npm run start:dev
 npm run start:prod
 ```
 
-## Test
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
-```
-
 ## License
-
-  Nest is [MIT licensed](LICENSE).
+[MIT licensed](LICENSE).
